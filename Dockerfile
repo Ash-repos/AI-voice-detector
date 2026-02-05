@@ -1,32 +1,16 @@
-# Use full Python 3.11 image
 FROM python:3.11
 
 WORKDIR /app
 
-# Install only required system packages
+# Install minimal system packages
 RUN apt-get update --allow-releaseinfo-change \
-    && apt-get install -y --no-install-recommends \
-       ffmpeg \
-       libsndfile1 \
-       git \
-       curl \
-       ca-certificates \
+    && apt-get install -y --no-install-recommends ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip
-RUN pip install --upgrade pip
-
-# Copy requirements and install
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-# Copy app code
 COPY . .
 
-# Expose port for Cloud Run
 EXPOSE 8080
-
-# Run FastAPI
 CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]
-
-
