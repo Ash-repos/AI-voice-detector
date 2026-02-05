@@ -4,13 +4,12 @@ FROM python:3.11
 # Set working directory
 WORKDIR /app
 
-# Install only the necessary system dependencies
+# Install only necessary system packages
 RUN apt-get update --allow-releaseinfo-change \
     && apt-get install -y --no-install-recommends \
        ffmpeg \
        libsndfile1 \
        git \
-       wget \
        curl \
        ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -18,15 +17,15 @@ RUN apt-get update --allow-releaseinfo-change \
 # Upgrade pip
 RUN pip install --upgrade pip
 
-# Copy and install Python dependencies
+# Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the project files
+# Copy all project files
 COPY . .
 
-# Expose the port for Cloud Run
+# Expose the port Cloud Run expects
 EXPOSE 8080
 
-# Start the FastAPI app with uvicorn
+# Start FastAPI with uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
