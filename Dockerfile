@@ -1,10 +1,9 @@
-# Use full Python image to avoid slim image apt-get issues
+# Use full Python 3.11 image
 FROM python:3.11
 
-# Set working directory
 WORKDIR /app
 
-# Install only necessary system packages
+# Install only required system packages
 RUN apt-get update --allow-releaseinfo-change \
     && apt-get install -y --no-install-recommends \
        ffmpeg \
@@ -17,15 +16,15 @@ RUN apt-get update --allow-releaseinfo-change \
 # Upgrade pip
 RUN pip install --upgrade pip
 
-# Copy requirements and install Python dependencies
+# Copy requirements and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all project files
+# Copy app code
 COPY . .
 
-# Expose the port Cloud Run expects
+# Expose port for Cloud Run
 EXPOSE 8080
 
-# Start FastAPI with uvicorn
+# Run FastAPI
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
